@@ -4,7 +4,9 @@ import datetime
 import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
+import logging
 
+logging.basicConfig(filename='news_log.log', level=logging.INFO)
 
 async def get_news(date_news, url_news, session):
     try:
@@ -12,8 +14,7 @@ async def get_news(date_news, url_news, session):
             page_content = BeautifulSoup(response.content, 'html.parser')
             div_news = page_content.find('article', itemprop="articleBody")
             temp = " ".join([str(rows.text) for rows in div_news.findAll('p')])
-            temp = temp.split("-", 1)
-            return [date_news, temp[1]]
+            return [date_news, temp]
     except:
         return None
 
@@ -34,7 +35,7 @@ async def scrape_news(start_date, end_date, file):
                 date = start_date.strftime('%Y/%m/%d')
                 date_news = start_date.strftime('%d.%m.%Y')
                 url = f'https://www.interfax.ru/russia/news/{date}'
-                print(url)
+                logging.info(date)
 
                 with session.get(url, headers=headers, allow_redirects=False, timeout=10) as response:
                     page_content = BeautifulSoup(
